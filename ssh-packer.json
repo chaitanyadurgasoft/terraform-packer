@@ -1,0 +1,41 @@
+{
+    "_comment": "Create a AWS AMI ith AMZ Linux 2018 with Java and Tomcat",
+    "variables": {
+        "region": "",
+        "source_ami": "",
+        "instance_type": "",
+        "vpc_id": "",
+        "subnet_id": ""
+    },
+    "_comment1": "packer build -var \"aws_secret_key=foo\" packer.json",
+    "_comment2": "packer build -var-file packer-vars.json packer.json",
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "region": "{{user `region`}}",
+            "source_ami": "{{user `source_ami`}}",
+            "instance_type": "{{user `instance_type`}}",
+            "ssh_username": "ubuntu",
+            "ami_name": "DevOpsClass-ansiable-Build-{{isotime | clean_resource_name}}",
+            "vpc_id": "{{user `vpc_id`}}",
+            "subnet_id": "{{user `subnet_id`}}",
+            "tags": {
+                "Name": "DevOpsClass-ansiable-Build-{{isotime | clean_resource_name}}"
+            }
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sudo useradd -m ansiableadmin --shell /bin/bash",
+                "sudo mkdir -p /home/ansiableadmin/.ssh",
+                "sudo chown -R ansiableadmin /home/ansiableadmin/",
+                "sudo usermod -aG sudo ansiableadmin",
+                "echo 'ansiableadmin ALL=(ALL) NOPASSWD:ALL'|sudo tee -a /etc/sudoers",
+                "sudo touch /home/ansiableadmin/.ssh/authorized_keys",
+                "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCHnT3axKHF69XzYcw6euFUFpNKg6cIcX1snITA/jBT+UAMW9lbhE3rQNrNGXK3lI1uirg49L6rbzXJmyTauvBlFiDtubz0rivtNlg8Ivh2EoBpliHpykAiU1kTCm1gnfwBGq/zyiMdcoq+LskmAQ79xJHEqCML/uU4H5WAFqgt9L2iKQJmgnpTPbvefbaHzex8zdpymatHHhRtrELU1/1UqhsgvYzMlhMfDTt9pkEZ3azKFtf63az5AKuSdnb3t+TCSFvernai/CSB0boRN0maAzoMpkszEzNrfj/7A2IhNSgFHpL3sHiC2FAw+9ZFbsXwJQPbybDClDnp9MGZj20d' |sudo tee /home/ansiableadmin/.ssh/authorized_keys "
+            ]
+        }
+    ]
+}
